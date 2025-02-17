@@ -1,14 +1,14 @@
 spring:
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:semantic;DATABASE_TO_UPPER=false;QUERY_TIMEOUT=30
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/supersonic?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true
     username: root
-    password: semantic
+    password: rootroot
   sql:
     init:
-      schema-locations: classpath:db/schema-h2.sql,classpath:db/schema-h2-demo.sql
-      data-locations: classpath:db/data-h2.sql,classpath:db/data-h2-demo.sql
-  h2:
-    console:
-      path: /h2-console/semantic
-      enabled: true
+      enabled: false
+      mode: always
+      username: root
+      password:
+      schema-locations: classpath:db/schema-mysql.sql,classpath:db/schema-mysql-demo.sql
+      data-locations: classpath:db/data-mysql.sql,classpath:db/data-mysql-demo.sql

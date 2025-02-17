@@ -79,21 +79,57 @@ const MetricTrendChart: React.FC<Props> = ({
           : groupDataValue[key];
       return result;
     }, {});
-
+    console.log('groupData',groupData)
+    
+   
     const sortedGroupKeys = Object.keys(groupData).sort((a, b) => {
-      return (
-        groupData[b][groupData[b].length - 1][valueColumnName] -
-        groupData[a][groupData[a].length - 1][valueColumnName]
-      );
+      return 1;
+      // modified by fujue 直接输出
+      // 按数据顺序直接输出 
+      // return (
+      //   groupData[b][groupData[b].length - 1][valueColumnName] -
+      //   groupData[a][groupData[a].length - 1][valueColumnName]
+      // );
     });
-
-    const xData = groupData[sortedGroupKeys[0]]?.map((item: any) => {
+    console.log(' groupData[sortedGroupKeys[0]]', groupData[sortedGroupKeys[0]])
+    console.log(' sortedGroupKeys[0]', sortedGroupKeys)
+    // const xData = groupData[sortedGroupKeys[0]]?.map((item: any) => {
+    const xDataOld = groupData[sortedGroupKeys[0]]?.map((item: any) => {
       const date = isArray(item[dateColumnName])
         ? item[dateColumnName].join('-')
         : `${item[dateColumnName]}`;
-      return date.length === 10 ? moment(date).format('MM-DD') : date;
+        return date;
+      // modified by fujue 直接输出
+      // return date.length === 10 ? moment(date).format('MM-DD') : date;
+    });
+    //将对象groupData的key组装成一个数组
+    const xData = Object.keys(groupData).map((category, index) => {
+      return category;
     });
 
+console.log('old',xDataOld)
+console.log('new',xData)
+
+const dataxx = sortedGroupKeys.map((category, index) => {
+  const data = groupData[category];
+  return {
+    type: chartType,
+    name: categoryColumnName ? category : metricField.name,
+    symbol: 'circle',
+    showSymbol: data.length === 1,
+    smooth: true,
+    data: data.map((item: any) => {
+      const value = item[valueColumnName];
+      return (metricField.dataFormatType === 'percent' ||
+        metricField.dataFormatType === 'decimal') &&
+        metricField.dataFormat?.needMultiply100
+        ? value * 100
+        : value;
+    }),
+    color: THEME_COLOR_LIST[index],
+  };
+});
+console.log('dataxx',dataxx)
     instanceObj.setOption({
       legend: categoryColumnName && {
         left: 0,
@@ -144,7 +180,7 @@ const MetricTrendChart: React.FC<Props> = ({
         formatter: function (params: any[]) {
           const param = params[0];
           const valueLabels = params
-            .sort((a, b) => b.value - a.value)
+            // .sort((a, b) => b.value - a.value)
             .map(
               (item: any) =>
                 `<div style="margin-top: 3px;">${
@@ -174,7 +210,9 @@ const MetricTrendChart: React.FC<Props> = ({
         top: categoryColumnName ? 45 : 20,
         containLabel: true,
       },
-      series: sortedGroupKeys.slice(0, 20).map((category, index) => {
+      // series: sortedGroupKeys.slice(0, 20).map((category, index) => {
+      // 全部输出
+      series: sortedGroupKeys.map((category, index) => {
         const data = groupData[category];
         return {
           type: chartType,
@@ -183,14 +221,20 @@ const MetricTrendChart: React.FC<Props> = ({
           showSymbol: data.length === 1,
           smooth: true,
           data: data.map((item: any) => {
+            console.log('series-data item',category,item)
             const value = item[valueColumnName];
-            return (metricField.dataFormatType === 'percent' ||
-              metricField.dataFormatType === 'decimal') &&
-              metricField.dataFormat?.needMultiply100
-              ? value * 100
-              : value;
+            
+            console.log('value',value)
+            //定义一个二维数组，第一个值为上面的category，第二个值为下面的value，返回这个二维数组
+            return [category,value]
+
+            // return (metricField.dataFormatType === 'percent' ||
+            //   metricField.dataFormatType === 'decimal') &&
+            //   metricField.dataFormat?.needMultiply100
+            //   ? value * 100
+            //   : value;
           }),
-          color: THEME_COLOR_LIST[index],
+          // color: THEME_COLOR_LIST[index],
         };
       }),
     });
